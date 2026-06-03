@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memórias | 50 anos de Kelly</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="topbar">
+        <div class="badge">MEMÓRIAS</div>
+        <button id="howBtn" class="help-btn" type="button">?</button>
+      </div>
+
+      <div class="crown">♛</div>
+      <p class="eyebrow">50 anos da</p>
+      <h1>Kelly</h1>
+      <div class="ornament">✦</div>
+      <h2>Roda de Desafios</h2>
+      <p class="subtitle">Sorteie um desafio, registre o momento e envie sua foto ou vídeo.</p>
+    </section>
+
+    <section id="screenHome" class="screen active">
+      <section class="card">
+        <label for="nome" class="label">Seu nome ou apelido</label>
+        <input id="nome" type="text" placeholder="Ex: Ana, João, Mesa 4..." />
+
+        <div class="challenge-box">
+          <p class="small">Seu desafio é...</p>
+          <div class="slot-window">
+            <div id="challengeText" class="challenge-text">Clique em sortear para começar</div>
+          </div>
+        </div>
+
+        <button id="drawBtn" class="btn primary">Sortear desafio</button>
+
+        <div id="uploadArea" class="upload-area hidden">
+          <p class="label">Como deseja enviar?</p>
+
+          <div class="upload-options">
+            <button id="takePhotoBtn" class="btn option-btn" type="button">Tirar foto</button>
+            <button id="recordVideoBtn" class="btn option-btn" type="button">Gravar vídeo</button>
+            <button id="chooseFileBtn" class="btn option-btn" type="button">Escolher da galeria</button>
+          </div>
+
+          <input id="cameraInput" class="hidden-file" type="file" accept="image/*" capture="environment" />
+          <input id="videoInput" class="hidden-file" type="file" accept="video/*" capture="environment" />
+          <input id="file" class="hidden-file" type="file" accept="image/*,video/*" />
+
+          <div id="selectedFileBox" class="selected-file hidden">
+            <strong>Arquivo selecionado:</strong>
+            <span id="selectedFileName"></span>
+          </div>
+
+          <button id="sendBtn" class="btn secondary" disabled>Enviar e pontuar</button>
+        </div>
+
+        <p id="status" class="status"></p>
+      </section>
+    </section>
+
+    <section id="screenRanking" class="screen">
+      <section class="ranking card">
+        <div class="section-header">
+          <div>
+            <p class="small">Pontuação geral</p>
+            <h3>Ranking</h3>
+          </div>
+          <button id="refreshRankingBtn" class="mini-btn" type="button">Atualizar</button>
+        </div>
+        <ol id="rankingList">
+          <li>Carregando...</li>
+        </ol>
+      </section>
+    </section>
+
+    <section id="screenGallery" class="screen">
+      <section class="card gallery-card">
+        <div class="section-header">
+          <div>
+            <p class="small">Memórias enviadas</p>
+            <h3>Galeria</h3>
+          </div>
+          <button id="refreshGalleryBtn" class="mini-btn" type="button">Atualizar</button>
+        </div>
+
+        <div id="galleryGrid" class="gallery-grid">
+          <p class="empty">Carregando galeria...</p>
+        </div>
+      </section>
+    </section>
+
+    <section id="screenInfo" class="screen">
+      <section class="card info-card">
+        <h3>Como funciona</h3>
+        <ol>
+          <li>Digite seu nome ou apelido.</li>
+          <li>Clique em “Sortear desafio”.</li>
+          <li>Tire a foto pelo próprio site ou escolha foto/vídeo da galeria.</li>
+          <li>Envie o arquivo para ganhar pontos.</li>
+          <li>Depois do envio, outro desafio será liberado.</li>
+        </ol>
+        <p class="muted">A pontuação só conta depois que a foto ou vídeo for enviado com sucesso.</p>
+      </section>
+    </section>
+
+    <div id="modal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <button id="closeModalBtn" class="close-btn" type="button">×</button>
+        <div id="modalMedia"></div>
+        <div id="modalInfo" class="modal-info"></div>
+      </div>
+    </div>
+
+    <div id="uploadModal" class="upload-modal hidden">
+      <div class="upload-modal-card">
+        <div class="loader-ornament">✦</div>
+        <p id="uploadModalText" class="upload-modal-text">Enviando sua memória...</p>
+        <div class="progress-track"><div id="uploadProgressBar" class="progress-fill"></div></div>
+        <p id="uploadModalPct" class="upload-modal-pct">0%</p>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-screen="screenHome">
+        <span>&#8962;</span>
+        Início
+      </button>
+      <button class="nav-btn" data-screen="screenRanking">
+        <span>&#9733;</span>
+        Ranking
+      </button>
+      <button class="nav-btn" data-screen="screenGallery">
+        <span>&#9638;</span>
+        Galeria
+      </button>
+      <button class="nav-btn" data-screen="screenInfo">
+        <span>&#9432;</span>
+        Informações
+      </button>
+    </nav>
+
+    <footer>
+      <p>Obrigado por fazer parte desse momento ✦</p>
+    </footer>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
