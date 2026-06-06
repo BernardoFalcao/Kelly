@@ -33,6 +33,10 @@ const uploadModal = document.getElementById("uploadModal");
 const uploadProgressBar = document.getElementById("uploadProgressBar");
 const uploadModalText = document.getElementById("uploadModalText");
 const uploadModalPct = document.getElementById("uploadModalPct");
+const confirmModal = document.getElementById("confirmModal");
+const confirmPreview = document.getElementById("confirmPreview");
+const confirmSendBtn = document.getElementById("confirmSendBtn");
+const confirmRedoBtn = document.getElementById("confirmRedoBtn");
 
 function setStatus(message, type = "") {
   statusEl.textContent = message;
@@ -229,6 +233,33 @@ function setSelectedFile(file) {
   setStatus("Arquivo pronto. Clique em enviar para pontuar.");
 }
 
+// ---- Modal de confirmação (enviar ou refazer) ----
+let confirmObjectUrl = null;
+let confirmRedoSource = null;
+
+function openConfirm(file, sourceInput, redoLabel) {
+  if (confirmObjectUrl) URL.revokeObjectURL(confirmObjectUrl);
+  confirmObjectUrl = URL.createObjectURL(file);
+  confirmRedoSource = sourceInput;
+
+  const isVideo = String(file.type || "").startsWith("video/");
+  confirmPreview.innerHTML = isVideo
+    ? `<video src="${confirmObjectUrl}" controls playsinline></video>`
+    : `<img src="${confirmObjectUrl}" alt="Pré-visualização" />`;
+
+  confirmRedoBtn.textContent = redoLabel;
+  confirmModal.classList.remove("hidden");
+}
+
+function hideConfirm() {
+  confirmModal.classList.add("hidden");
+  confirmPreview.innerHTML = "";
+  if (confirmObjectUrl) {
+    URL.revokeObjectURL(confirmObjectUrl);
+    confirmObjectUrl = null;
+  }
+}
+
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -321,6 +352,8 @@ async function sendFile() {
     setUploadProgress(0.05, "Otimizando arquivo...");
     const fileToSend = await compressImage(selectedFile);
 
+    const isVideoUpload = String(fileToSend.type || "").startsWith("video/");
+
     setUploadProgress(0.1, "Enviando sua memória...");
     const base64 = await fileToBase64(fileToSend);
 
@@ -365,7 +398,9 @@ async function sendFile() {
     challengeText.textContent = "Desafio concluído! Pode sortear outro.";
     drawBtn.disabled = false;
     drawBtn.textContent = "Sortear novo desafio";
-    setStatus("Parabéns! Desafio concluído com sucesso.", "success");
+    setStatus(isVideoUpload
+      ? "Vídeo enviado com sucesso! Ele pode levar 1–2 minutos para ficar disponível na galeria."
+      : "Parabéns! Desafio concluído com sucesso.", "success");
     await loadRanking();
     await loadGallery();
   } catch (err) {
@@ -484,7 +519,7 @@ function openMedia(item) {
   // O player do Drive (/preview) toca vídeo E mostra imagem de forma confiável.
   const embedUrl = id ? `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview` : fallbackUrl;
   const playerHtml = `<iframe src="${escapeHtml(embedUrl)}" allow="autoplay" allowfullscreen></iframe>
-       <p class="modal-info"><a href="${escapeHtml(fallbackUrl)}" target="_blank" rel="noopener" style="color:#f5d889">Abrir no Drive</a></p>`;
+       <p class="modal-info processing-note">Vídeos recém-enviados podem levar 1–2 minutos para ficar prontos. Se aparecer "processando", aguarde um pouco e tente de novo. <a href="${escapeHtml(fallbackUrl)}" target="_blank" rel="noopener" style="color:#f5d889">Abrir no Drive</a></p>`;
 
   if (isVideo) {
     modalMedia.innerHTML = playerHtml;
@@ -563,17 +598,33 @@ chooseFileBtn.addEventListener("click", () => fileInput.click());
 cameraInput.addEventListener("change", () => {
   const file = cameraInput.files && cameraInput.files[0];
   setSelectedFile(file);
+  if (selectedFile) openConfirm(selectedFile, cameraInput, "Tirar outra foto");
 });
 
 videoInput.addEventListener("change", () => {
   const file = videoInput.files && videoInput.files[0];
   setSelectedFile(file);
+  if (selectedFile) openConfirm(selectedFile, videoInput, "Gravar outro vídeo");
 });
 
 fileInput.addEventListener("change", () => {
   const file = fileInput.files && fileInput.files[0];
   setSelectedFile(file);
+  if (selectedFile) openConfirm(selectedFile, fileInput, "Escolher outro arquivo");
 });
+
+confirmSendBtn.addEventListener("click", () => {
+  hideConfirm();
+  sendFile();
+});
+
+confirmRedoBtn.addEventListener("click", () => {
+  const source = confirmRedoSource;
+  hideConfirm();
+  if (source) source.click();
+});
+
+document.querySelector(".confirm-backdrop").addEventListener("click", hideConfirm);
 
 document.querySelectorAll(".nav-btn").forEach(btn => {
   btn.addEventListener("click", () => showScreen(btn.dataset.screen));
